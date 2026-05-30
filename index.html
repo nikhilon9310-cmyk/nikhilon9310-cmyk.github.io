@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikhil — Builder. Observer. Thinker.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f9f6f1;
+  --ink: #151512;
+  --muted: #7a7568;
+  --accent: #c8391a;
+  --surface: #f0ebe0;
+  --border: #e0d9cc;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(249,246,241,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.nav-name span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+@media (max-width: 560px) {
+  nav { padding: 0 20px; }
+  .nav-links { gap: 16px; }
+  .nav-links a { font-size: 10px; letter-spacing: 1px; }
+}
+
+/* ── HERO ── */
+#home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 80px 40px 60px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-inner { width: 100%; }
+
+.hero-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: block;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: 32px;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-desc {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+}
+
+.hero-desc strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.hero-links {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 14px 28px;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+}
+
+.btn-secondary {
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+}
+
+.btn-secondary:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.hero-scroll {
+  margin-top: 80px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-scroll::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── SECTIONS SHARED ── */
+section {
+  padding: 100px 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: block;
+}
+
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 48px;
+}
+
+/* ── ABOUT ── */
+#about {
+  border-top: 1px solid var(--border);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
+
+.about-text p {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.about-text p strong { color: var(--ink); font-weight: 500; }
+
+.about-facts {
+  display: grid;
+  gap: 16px;
+}
+
+.fact {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.fact-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.fact-value {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ── PROJECT ── */
+#project {
+  border-top: 1px solid var(--border);
+  background: var(--ink);
+  color: var(--bg);
+  max-width: 100%;
+  padding: 100px 40px;
+}
+
+#project .inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+#project .section-label { color: #c8391a; }
+
+#project h2 { color: var(--bg); margin-bottom: 16px; }
+
+.project-subtitle {
+  font-size: 18px;
+  font-weight: 300;
+  color: rgba(249,246,241,0.5);
+  margin-bottom: 56px;
+  font-style: italic;
+  max-width: 500px;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  margin-bottom: 48px;
+}
+
+@media (max-width: 600px) { .project-grid { grid-template-columns: 1fr; } }
+
+.project-card {
+  padding: 32px;
+  background: var(--ink);
+  transition: background 0.2s;
+}
+
+.project-card:hover { background: #1e1e1a; }
+
+.card-icon { font-size: 28px; margin-bottom: 16px; }
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--bg);
+}
+
+.card-desc {
+  font-size: 14px;
+  color: rgba(249,246,241,0.5);
+  line-height: 1.6;
+}
+
+.project-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 4px;
+  transition: gap 0.2s;
+}
+
+.project-cta:hover { gap: 20px; }
+
+/* ── BLOG ── */
+#blog {
+  border-top: 1px solid var(--border);
+}
+
+.blog-grid {
+  display: grid;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+
+.blog-post {
+  background: var(--bg);
+  padding: 32px 36px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  transition: background 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.blog-post:hover { background: var(--surface); }
+
+.post-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.post-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.post-excerpt {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.post-arrow {
+  font-size: 24px;
+  color: var(--border);
+  transition: color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.blog-post:hover .post-arrow {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.post-coming {
+  background: var(--surface);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.post-coming:hover { background: var(--surface); }
+.post-coming:hover .post-arrow { color: var(--border); transform: none; }
+
+/* ── CONTACT ── */
+#contact {
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+#contact h2 { margin-bottom: 16px; }
+
+.contact-sub {
+  font-size: 17px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 48px;
+  font-style: italic;
+}
+
+.contact-links {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.footer-name span { color: var(--accent); }
+
+.footer-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* Blog post modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(21,21,18,0.85);
+  z-index: 200;
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+
+.modal-overlay.open { display: block; }
+
+.modal {
+  background: var(--bg);
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 56px 48px;
+  position: relative;
+}
+
+@media (max-width: 560px) { .modal { padding: 40px 24px; } }
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.modal-close:hover { color: var(--ink); }
+
+.modal-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.modal-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+.modal-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.modal h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+}
+
+.modal-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--muted);
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 36px 0;
+}
+
+.modal-divider::before,
+.modal-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.modal-divider span {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.modal-body p {
+  font-family: 'Source Serif 4', serif;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.85;
+  margin-bottom: 24px;
+  color: var(--ink);
+}
+
+.modal-body p strong { font-weight: 600; }
+.modal-body p em { font-style: italic; }
+
+.modal-body h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 40px 0 16px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  letter-spacing: -0.5px;
+}
+
+.modal-body blockquote {
+  margin: 36px 0;
+  padding: 24px 28px;
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.modal-body .highlight {
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin: 32px 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.modal-body .highlight strong {
+  color: var(--ink);
+  font-style: normal;
+}
+
+.drop-cap::first-letter {
+  font-family: 'Playfair Display', serif;
+  font-size: 64px;
+  font-weight: 900;
+  float: left;
+  line-height: 0.8;
+  margin: 8px 10px 0 0;
+  color: var(--accent);
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-name">Nikhil<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#project">Project</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div id="home">
+  <div class="hero-inner">
+    <span class="hero-tag">India · Class XI · Builder</span>
+    <h1>I build.<br>I observe.<br>I <em>think.</em></h1>
+    <p class="hero-desc">
+      I'm Nikhil — a student fascinated by <strong>robotics, technology, and the world around me.</strong>
+      I design systems that solve real problems, and I write about what I notice.
+    </p>
+    <div class="hero-links">
+      <a href="#project" class="btn btn-primary">See My Work</a>
+      <a href="#blog" class="btn btn-secondary">Read The Blog</a>
+    </div>
+    <div class="hero-scroll">Scroll to explore</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <span class="section-label">About</span>
+  <h2>Who I Am</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm a Class XI student from India, preparing for JEE while building things on the side that actually interest me. I learn best by <strong>observing the world and asking why.</strong></p>
+      <p>A robotics idea started from watching an auto-rickshaw on the way to coaching. A civic initiative started from noticing a dirty park. That's how my brain works — <strong>connections between everyday things and bigger problems.</strong></p>
+      <p>I believe technology should amplify human potential, not replace it. That belief shapes everything I build and everything I write.</p>
+    </div>
+    <div class="about-facts">
+      <div class="fact">
+        <div class="fact-label">Currently Learning</div>
+        <div class="fact-value">Python · Robotics Design · JEE Physics & Math</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Active Project</div>
+        <div class="fact-value">Project AXIS — Modular Hybrid Robotics System</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Interests</div>
+        <div class="fact-value">Robotics · AI · Social Observation · Film Technology</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Goal</div>
+        <div class="fact-value">Build technology that solves real industry problems</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECT -->
+<div id="project">
+  <div class="inner">
+    <span class="section-label">Featured Project</span>
+    <h2>Project AXIS</h2>
+    <p class="project-subtitle">A modular hybrid locomotion and cinematic robotics system.</p>
+
+    <div class="project-grid">
+      <div class="project-card">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">Hybrid Locomotion</div>
+        <div class="card-desc">Bipedal legs with tricycle roller wheels — inspired by auto-rickshaw geometry. Stable, energy-efficient, narrow footprint.</div>
+      </div>
+      <div class="project-card">
+        <div class="card-icon">🚁</div>
+        <div class="card-title">Detachable Drone Head</div>
+        <div class="card-desc">When terrain gets unsuitable, the drone head detaches and continues aerially. Body navigates independently to reunite on the other side.</div>
+      </div>
+      <div class="project-card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Dual Power System</div>
+        <div class="card-desc">Li-ion for normal movement. Supercapacitors for burst power. Opportunistic self-charging during idle periods.</div>
+      </div>
+      <div class="project-card">
+        <div class="card-icon">🔋</div>
+        <div class="card-title">Autonomous Battery Swap</div>
+        <div class="card-desc">Fighter jet-inspired ejection mechanism. Drone returns, dead battery ejects, fresh battery loads — zero human intervention.</div>
+      </div>
+    </div>
+
+    <a href="https://github.com/nikhilon9310-cmyk/Project-Axis" class="project-cta" target="_blank">
+      View Full Design Study on GitHub →
+    </a>
+  </div>
+</div>
+
+<!-- BLOG -->
+<section id="blog">
+  <span class="section-label">Blog · Observed</span>
+  <h2>What I Notice</h2>
+
+  <div class="blog-grid">
+    <a class="blog-post" onclick="openPost(); return false;" href="#">
+      <div>
+        <div class="post-tag">Civic Sense · Society</div>
+        <div class="post-title">The Cupcake Wrapper</div>
+        <div class="post-excerpt">A small act of carelessness and a very large question about who we are becoming.</div>
+      </div>
+      <div class="post-arrow">→</div>
+    </a>
+
+    <div class="blog-post post-coming">
+      <div>
+        <div class="post-tag">Robotics · Technology</div>
+        <div class="post-title">What an Auto-Rickshaw Taught Me About Robot Design</div>
+        <div class="post-excerpt">Coming soon.</div>
+      </div>
+      <div class="post-arrow">→</div>
+    </div>
+
+    <div class="blog-post post-coming">
+      <div>
+        <div class="post-tag">Society · Equality</div>
+        <div class="post-title">Equality Means Equality — Not Selective Justice</div>
+        <div class="post-excerpt">Coming soon.</div>
+      </div>
+      <div class="post-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <span class="section-label">Contact</span>
+  <h2>Let's Connect</h2>
+  <p class="contact-sub">I'm always open to conversations about robotics, technology, and ideas.</p>
+  <div class="contact-links">
+    <a href="https://github.com/nikhilon9310-cmyk" class="btn btn-primary" target="_blank">GitHub</a>
+    <a href="mailto:your@email.com" class="btn btn-secondary">Email</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Nikhil<span>.</span></div>
+  <div class="footer-note">Built with curiosity · India · 2025</div>
+</footer>
+
+<!-- BLOG MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closePost()">✕ Close</button>
+
+    <div class="modal-meta">
+      <span class="modal-tag">Civic Sense</span>
+      <span class="modal-tag">Society</span>
+      <span class="modal-date">Issue 01 · 2025</span>
+    </div>
+
+    <h1>The Cupcake Wrapper</h1>
+    <p class="modal-subtitle">A small act of carelessness and a very large question about who we are becoming.</p>
+
+    <div class="modal-divider"><span>begins here</span></div>
+
+    <div class="modal-body">
+      <p class="drop-cap">It was 7:30 in the evening. Coaching had just ended and everyone was spilling out onto the road — tired, hungry, phone in hand. I was one of them. And so was he.</p>
+
+      <p>He was walking ahead of me, loud on his phone, clearly in an argument with someone. In his other hand — a cupcake. He ate it in a few bites, still talking, still walking. And then, without a pause, without a glance, he let the wrapper fall. Just like that. Onto the road. And kept walking.</p>
+
+      <p>It lasted maybe two seconds. He probably doesn't remember it. But I haven't stopped thinking about it since.</p>
+
+      <blockquote>"These are the future of our nation. In twenty years, they will be in offices, in Parliament, in boardrooms. And they just threw a wrapper on the road without blinking."</blockquote>
+
+      <p>I want to be clear — I am not writing this to judge one person. I don't know him. He might be brilliant. He might be kind to his family. One wrapper doesn't define a human being. But it does reveal something. And that something is what I can't stop thinking about.</p>
+
+      <h2>It's Not a Moral Problem. It's a Sensitivity Problem.</h2>
+
+      <p>We talk about civic sense as if it's about morality. As if people litter because they are bad people. I don't think that's true. I think people litter because they have stopped feeling connected to the space around them.</p>
+
+      <p>The road doesn't feel like <em>their</em> road. The park doesn't feel like <em>their</em> park. Public space has become a place that belongs to nobody — and what belongs to nobody, nobody takes care of.</p>
+
+      <p>I tested this once. In the park near my home, I noticed people were littering consistently. Not because they were careless people — but because there was only one dustbin at one end of the park. Walking all the way there felt like too much effort. The environment was designed for littering, not against it.</p>
+
+      <p>So I put up a simple sign. Not a lecture about morality. Just a notice that said littering would be fined five hundred rupees. And it worked. The park got cleaner — not because people suddenly became better humans, but because the environment changed.</p>
+
+      <div class="highlight">
+        <strong>This is the real lesson:</strong> People respond to systems, not sermons. If you want behaviour to change, change the environment first. Moral lectures have never cleaned a single road.
+      </div>
+
+      <p>But the park experiment only solves the symptom. The deeper question is — why do we need a fine to care about our own surroundings in the first place?</p>
+
+      <h2>The Generation That Will Inherit Everything</h2>
+
+      <p>Here is what unsettles me most. The person with the cupcake wrapper — he is my generation. Gen Z. The generation that posts about climate change, shares aesthetic reels about minimalism, and talks about mental health awareness.</p>
+
+      <p>We are, by every measure, the most informed generation in Indian history. We have the internet. We have access to every idea ever written. We know about pollution. We know about civic responsibility. We have seen the videos of overflowing landfills and choked rivers.</p>
+
+      <p>And we still throw the wrapper.</p>
+
+      <blockquote>"Knowing and feeling are not the same thing. We know everything. We feel very little."</blockquote>
+
+      <p>In twenty to thirty years, this generation will be everywhere — in government, in business, in the armed forces. The people making decisions about our cities, our infrastructure, our public spaces — they are currently walking out of coaching classes and dropping wrappers on the road.</p>
+
+      <p>I am not being pessimistic. I am being honest. And I think honesty is more useful than comfort right now.</p>
+
+      <h2>What Can Actually Change This?</h2>
+
+      <p>I have thought about this a lot. And I don't think the answer is more awareness campaigns or stricter laws — though those help. I think the answer is <strong>sensitivity.</strong></p>
+
+      <p>Sensitivity to your surroundings. The feeling that this road, this park, this city — it is yours. Not the government's. Not someone else's. Yours. And you are responsible for it.</p>
+
+      <p>That feeling doesn't come from a poster. It comes from being raised to notice. To look around. To ask — what does this place look like because of me?</p>
+
+      <p>Most of us were never asked that question. Maybe that is where it starts. Not with fines. Not with campaigns. But with a simple habit of noticing — and caring about what you notice.</p>
+
+      <p>I am still working out what to do with that answer. But I think asking the question out loud is a start.</p>
+
+      <div class="modal-divider"><span>end</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openPost() {
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePost() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeOnOverlay(e) {
+    if (e.target === document.getElementById('modal')) closePost();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closePost();
+  });
+</script>
+
+</body>
+</html>
